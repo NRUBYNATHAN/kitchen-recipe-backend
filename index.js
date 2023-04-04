@@ -32,9 +32,11 @@ app.post("/addrecipe", async function (request, response) {
   console.log(recipe);
   response.send(recipe);
 });
-
+app.get("/", async function (request, response) {
+  response.send("hello🎉🎉");
+});
 //GET RECIPE
-app.get("/", auth, async function (request, response) {
+app.get("/allrecipe", auth, async function (request, response) {
   const result = await client
     .db("kitchen")
     .collection("recipe")
