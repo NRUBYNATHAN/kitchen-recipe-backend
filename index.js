@@ -9,17 +9,26 @@ const app = express();
 
 import cors from "cors";
 import { auth } from "./middleware/auth.js";
+app.use(cors({ origin: "*" }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+app.use(function (req, res, next) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Credentials", true);
+  next();
+});
 // import { ObjectId } from "mongodb";
 const PORT = process.env.PORT;
 const MONGO_URL = process.env.MONGO_URL;
 const client = new MongoClient(MONGO_URL); // dial
-// Top level await
-await client.connect(); // call
-console.log("Mongo is connected !!!  ");
-app.use(cors({ origin: "*" }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+async function connectdb() {
+  await client.connect(); // call
+  console.log("Mongo is connected !!!  ");
+}
+connectdb();
 
 //POST RECIPE
 app.post("/addrecipe", async function (request, response) {
