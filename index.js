@@ -179,25 +179,29 @@ app.post("/signup", async function (request, response) {
     console.log(result);
   }
 });
-app.post("/login", async function (request, response) {
-  const { email, password } = request.body;
-  const UserFromDb = await client
-    .db("kitchen")
-    .collection("signup")
-    .findOne({ email: email });
+app.post("/userLogin", async function (request, response) {
+  try {
+    const { email, password } = request.body;
+    const UserFromDb = await client
+      .db("kitchen")
+      .collection("signup")
+      .findOne({ email: email });
 
-  if (!UserFromDb) {
-    response.status(401).send({ message: "invalid credentials" });
-  } else {
-    const storedDBPassword = UserFromDb.password;
-    const isPasswordCheck = await bcrypt.compare(password, storedDBPassword);
-
-    if (isPasswordCheck) {
-      const token = jwt.sign({ id: UserFromDb._id }, process.env.SECRET_KEY);
-      response.send({ message: "login successful", token: token });
+    if (!UserFromDb) {
+      response.status(401).json({ message: "invalid credentials" });
     } else {
-      response.status(401).send({ message: "invalid credentials" });
+      const storedDBPassword = UserFromDb.password;
+      const isPasswordCheck = await bcrypt.compare(password, storedDBPassword);
+
+      if (isPasswordCheck) {
+        const token = jwt.sign({ id: UserFromDb._id }, process.env.SECRET_KEY);
+        response.json({ message: "login successful", token: token });
+      } else {
+        response.status(401).json({ message: "invalid credentials" });
+      }
     }
+  } catch (err) {
+    response.json(err);
   }
 });
 
