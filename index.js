@@ -21,8 +21,9 @@ app.use(function (req, res, next) {
   next();
 });
 // import { ObjectId } from "mongodb";
-const PORT = process.env.PORT;
-const MONGO_URL = process.env.MONGO_URL;
+const PORT = 4000;
+const MONGO_URL =
+  "mongodb+srv://rubynathan:ruby999@cluster0.abcwmtd.mongodb.net";
 const client = new MongoClient(MONGO_URL); // dial
 async function connectdb() {
   await client.connect(); // call
@@ -194,14 +195,16 @@ app.post("/userLogin", async function (request, response) {
       const isPasswordCheck = await bcrypt.compare(password, storedDBPassword);
 
       if (isPasswordCheck) {
-        const token = jwt.sign({ id: UserFromDb._id }, process.env.SECRET_KEY);
+        const token = jwt.sign({ id: UserFromDb._id }, "my_secret_key");
         response.json({ message: "login successful", token: token });
       } else {
         response.status(401).json({ message: "invalid credentials" });
       }
     }
   } catch (err) {
-    response.json(err);
+    response.json({
+      message: err.message,
+    });
   }
 });
 
